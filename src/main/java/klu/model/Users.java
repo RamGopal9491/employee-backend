@@ -24,11 +24,11 @@ public class Users {
     private String department;
     private String marital;
 
-    // store base64 image — use LONGTEXT for MySQL; for Postgres use text
-    @Column(columnDefinition = "LONGTEXT")
-    private String photo;
+    @Lob
+    @Column(name = "photo", columnDefinition = "LONGTEXT")
+    private String photo; // ✅ base64 encoded photo
 
-    // Getters and setters
+    // Getters & setters
     public Long getEmpid() { return empid; }
     public void setEmpid(Long empid) { this.empid = empid; }
 

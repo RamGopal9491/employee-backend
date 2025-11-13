@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 import dto.LeaveRequestDTO;
 
+import java.time.LocalDate;
 import java.util.*;
 
 @RestController
@@ -85,4 +86,15 @@ public class LeaveController {
                     .body(Map.of("message", "Error fetching leaves"));
         }
     }
+    
+    @GetMapping("/applied/{date}")
+    public ResponseEntity<?> getLeavesByAppliedDate(@PathVariable String date) {
+        LocalDate appliedDate = LocalDate.parse(date);
+        List<Leave> leaves = leaveRepo.findByAppliedDate(appliedDate);
+        return ResponseEntity.ok(Map.of(
+            "count", leaves.size(),
+            "leaves", leaves
+        ));
+    }
+
 }

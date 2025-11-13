@@ -22,13 +22,18 @@ public class UserManager {
 
     // --- Add User ---
     public ResponseEntity<String> addUser(Users U) {
-        if (UR.countByEmail(U.getEmail()) > 0) {
-            return new ResponseEntity<>("401::Email Already Exist", HttpStatus.NOT_FOUND);
-        } else {
-            System.out.println("signup manager");
-            System.out.println(U.getFullname());
-            UR.save(U);
-            return new ResponseEntity<>("200::Registration Successful", HttpStatus.OK);
+        try {
+            if (UR.validateEmail(U.getEmail()) > 0) {
+                return new ResponseEntity<>("401::Email Already Exist", HttpStatus.BAD_REQUEST);
+            } else {
+                System.out.println("Signup Manager: " + U.getFullname());
+                UR.save(U);
+                return new ResponseEntity<>("200::Registration Successful", HttpStatus.OK);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>("500::Internal Server Error: " + e.getMessage(),
+                                        HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -36,30 +41,34 @@ public class UserManager {
     public String getPassword(Long empid) {
         Users U = UR.findById(empid).orElse(null);
         if (U == null) {
-            return null;
+            return "Employee not found";
         }
+
         String message = "Dear " + U.getFullname() +
-                         "\n\nYour password is " + U.getPassword();
+                         ",\n\nYour password is: " + U.getPassword();
         return EM.sendEmail(U.getEmail(), "EMPLOYEE: Password Recovery", message);
     }
 
     // --- Sign In ---
     public UserResponse signIn(String email, String password) {
-        System.out.println("signin");
-        System.out.println(email + " " + password);
+        System.out.println("Signin attempt: " + email);
 
-        // validate credentials (your existing count method)
+        // Check credentials
         if (UR.validateCredentials(email, password) == 0) {
-            System.out.println("wrong credentials");
-            return null; // invalid credentials
+            System.out.println("❌ Invalid credentials for " + email);
+            return null;
         }
 
+        // Generate JWT token
         String token = JWT.generateJWT(email);
-        System.out.println(token);
 
-        // fetch user safely using Optional
-        return UR.findByEmail(email)
-                 .map(user -> new UserResponse(token, user))
-                 .orElse(null);
+        // Fetch user info
+        Users user = UR.findByEmail(email);
+        if (user == null) {
+            return null;
+        }
+
+        // Return response with token + user info
+        return new UserResponse(token, user);
     }
 }

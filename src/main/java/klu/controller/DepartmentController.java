@@ -9,7 +9,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/departments")
-@CrossOrigin(origins = "http://localhost:5173") // ✅ allow React dev server
+@CrossOrigin(origins = "http://localhost:5173") //  allow React dev server
 public class DepartmentController {
 
     private final DepartmentService departmentService;

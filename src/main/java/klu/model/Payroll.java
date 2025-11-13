@@ -1,9 +1,6 @@
 package klu.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 
 @Entity
 public class Payroll {
@@ -12,23 +9,28 @@ public class Payroll {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    // ✅ Link to employee ID
+    private Long empid;
+
     private String name;
     private String department;
     private double salary;
 
-    // Default constructor required by JPA
     public Payroll() {}
 
-    // Constructor for convenience
-    public Payroll(String name, String department, double salary) {
+    public Payroll(Long empid, String name, String department, double salary) {
+        this.empid = empid;
         this.name = name;
         this.department = department;
         this.salary = salary;
     }
 
-    // Getters and setters
+    // Getters and Setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
+
+    public Long getEmpid() { return empid; }
+    public void setEmpid(Long empid) { this.empid = empid; }
 
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }

@@ -6,62 +6,83 @@ import klu.repository.LeaveRepository;
 import klu.repository.UserRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import dto.LeaveRequestDTO;
 
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api/leaves")
-@CrossOrigin(origins = "*") // React frontend
+@CrossOrigin(origins = "http://localhost:5173")
 public class LeaveController {
 
     @Autowired
     private LeaveRepository leaveRepo;
+    
+    
 
     @Autowired
     private UserRepository userRepo;
 
-    // ✅ Apply new leave (accept DTO with empId)
+    // ✅ Apply new leave
     @PostMapping
-    public Leave applyLeave(@RequestBody LeaveRequestDTO dto) {
-        Users user = userRepo.findById(dto.getEmpId())
-                .orElseThrow(() -> new RuntimeException("Employee not found"));
+    public ResponseEntity<?> applyLeave(@RequestBody LeaveRequestDTO dto) {
+        try {
+            Users user = userRepo.findById(dto.getEmpId())
+                    .orElseThrow(() -> new RuntimeException("Employee not found"));
 
-        Leave leave = new Leave();
-        leave.setUser(user);
-        leave.setType(dto.getType());
-        leave.setReason(dto.getReason());
-        leave.setStartDate(dto.getStartDate());
-        leave.setEndDate(dto.getEndDate());
-        leave.setDays(dto.getDays());
-        leave.setStatus("Pending");
+            Leave leave = new Leave();
+            leave.setUser(user);
+            leave.setType(dto.getType());
+            leave.setReason(dto.getReason());
+            leave.setStartDate(dto.getStartDate());
+            leave.setEndDate(dto.getEndDate());
+            leave.setDays(dto.getDays());
+            leave.setStatus("Pending");
 
-        return leaveRepo.save(leave);
+            Leave saved = leaveRepo.save(leave);
+            return ResponseEntity.ok(saved);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
+        }
     }
 
     // ✅ Get leaves by employee ID
     @GetMapping("/emp/{empId}")
-    public List<Leave> getLeavesByEmployee(@PathVariable Long empId) {
-        return leaveRepo.findByUserEmpid(empId);
+    public ResponseEntity<?> getLeavesByEmployee(@PathVariable Long empId) {
+        List<Leave> leaves = leaveRepo.findByUserEmpid(empId);
+        return ResponseEntity.ok(leaves);
     }
 
     // ✅ Approve leave
     @PutMapping("/{id}/approve")
-    public Leave approveLeave(@PathVariable UUID id) {
-        Leave leave = leaveRepo.findById(id).orElseThrow();
+    public ResponseEntity<?> approveLeave(@PathVariable UUID id) {
+        Leave leave = leaveRepo.findById(id)
+                .orElseThrow(() -> new RuntimeException("Leave not found"));
         leave.setStatus("Approved");
-        return leaveRepo.save(leave);
+        return ResponseEntity.ok(leaveRepo.save(leave));
     }
 
     // ✅ Reject leave
     @PutMapping("/{id}/reject")
-    public Leave rejectLeave(@PathVariable UUID id) {
-        Leave leave = leaveRepo.findById(id).orElseThrow();
+    public ResponseEntity<?> rejectLeave(@PathVariable UUID id) {
+        Leave leave = leaveRepo.findById(id)
+                .orElseThrow(() -> new RuntimeException("Leave not found"));
         leave.setStatus("Rejected");
-        return leaveRepo.save(leave);
+        return ResponseEntity.ok(leaveRepo.save(leave));
+    }
+
+    // ✅ Get all leaves
+    @GetMapping
+    public ResponseEntity<?> getAllLeaves() {
+        try {
+            List<Leave> leaves = leaveRepo.findAll();
+            return ResponseEntity.ok(leaves);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError()
+                    .body(Map.of("message", "Error fetching leaves"));
+        }
     }
 }
-	

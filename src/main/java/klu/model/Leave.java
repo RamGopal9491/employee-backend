@@ -12,7 +12,7 @@
 		    @GeneratedValue(strategy = GenerationType.UUID)
 		    private UUID leaveId;   
 		
-		    @ManyToOne(fetch = FetchType.LAZY)
+		    @ManyToOne(fetch = FetchType.EAGER)
 		    @JoinColumn(name = "empid", referencedColumnName = "empid", nullable = false)
 		    private Users user;
 		    

@@ -12,21 +12,21 @@ import klu.repository.UserRepository;
 public class UserManager {
 
     @Autowired
-    UserRepository UR;
+    private UserRepository UR;
 
     @Autowired
-    EmailManager EM;
+    private EmailManager EM;
 
     @Autowired
-    JwtManager JWT;
+    private JwtManager JWT;
 
     // --- Add User ---
     public ResponseEntity<String> addUser(Users U) {
-        if (UR.validateEmail(U.getEmail()) > 0) {
+        if (UR.countByEmail(U.getEmail()) > 0) {
             return new ResponseEntity<>("401::Email Already Exist", HttpStatus.NOT_FOUND);
         } else {
-        	System.out.println("signup manger");
-        	System.out.println(U.getFullname());
+            System.out.println("signup manager");
+            System.out.println(U.getFullname());
             UR.save(U);
             return new ResponseEntity<>("200::Registration Successful", HttpStatus.OK);
         }
@@ -44,18 +44,22 @@ public class UserManager {
     }
 
     // --- Sign In ---
-    public UserResponse signIn(String email, String password, String role) {
-    	System.out.println("signim");
-    	System.out.println(email+""+password+""+role);
-        if (UR.validateCredentials(email, password, role) == 0) {
-        	System.out.println("wromg ");
+    public UserResponse signIn(String email, String password) {
+        System.out.println("signin");
+        System.out.println(email + " " + password);
+
+        // validate credentials (your existing count method)
+        if (UR.validateCredentials(email, password) == 0) {
+            System.out.println("wrong credentials");
             return null; // invalid credentials
         }
-        
-        String token = JWT.generateJWT(email, role);
-        System.out.println(token);
-        Users user = UR.findByEmail(email); // fetch user from repo
-        return new UserResponse(token, user);
-    }
 
+        String token = JWT.generateJWT(email);
+        System.out.println(token);
+
+        // fetch user safely using Optional
+        return UR.findByEmail(email)
+                 .map(user -> new UserResponse(token, user))
+                 .orElse(null);
+    }
 }

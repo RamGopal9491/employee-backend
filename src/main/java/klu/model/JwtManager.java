@@ -18,10 +18,9 @@ public class JwtManager {
     private static final SecretKey KEY = Keys.hmacShaKeyFor(SEC_KEY.getBytes());
 
     // Generate JWT
-    public String generateJWT(String fullname,String role) {
+    public String generateJWT(String fullname) {
         Map<String, Object> data = new HashMap<>();
         data.put("fullname", fullname);
-        data.put("role",role);
         
 
         return Jwts.builder()

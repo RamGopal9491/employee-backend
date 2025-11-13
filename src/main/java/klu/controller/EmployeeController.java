@@ -1,7 +1,10 @@
 package klu.controller;
 
 import klu.model.Employee;
+import klu.model.Users;
 import klu.repository.EmployeeRepository;
+import klu.repository.UserRepository;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,11 +20,7 @@ public class EmployeeController {
     @Autowired
     private EmployeeRepository employeeRepository;
 
-    // ✅ Get all employees
-    @GetMapping
-    public List<Employee> getAllEmployees() {
-        return employeeRepository.findAll();
-    }
+ 
 
     // ✅ Get employee by id
     @GetMapping("/{id}")

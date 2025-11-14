@@ -7,7 +7,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/payrolls")
-@CrossOrigin(origins = "http://localhost:5173")   // React frontend URL
+@CrossOrigin(origins = "*")   // React frontend URL
 public class PayrollController {
 
     private final PayrollRepository payrollRepository;

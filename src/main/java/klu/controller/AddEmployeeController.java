@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@CrossOrigin(origins = "http://localhost:5173") // React frontend
+@CrossOrigin(origins = "*") // React frontend
 @RestController
 @RequestMapping("/api/addemployees")
 public class AddEmployeeController {

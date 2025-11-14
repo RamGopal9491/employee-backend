@@ -20,7 +20,7 @@ import klu.repository.EmployeePerformanceRepository;
 
 @RestController
 @RequestMapping("/users")
-@CrossOrigin(origins = "http://localhost:5173")
+@CrossOrigin(origins = "*")
 public class UserController {
 
     private final UserRepository userRepository;
@@ -39,18 +39,23 @@ public class UserController {
         this.um = um;
     }
 
-    // --- Signup ---
     @PostMapping("/signup")
     public ResponseEntity<String> signUp(@RequestBody Users user) {
         try {
+            // CRITICAL FIX — Do not allow update of an existing user
+            user.setEmpid(null);
+
+            // Save new user
             Users savedUser = userRepository.save(user);
 
+            // Create Payroll entry
             Payroll payroll = new Payroll();
             payroll.setName(savedUser.getFullname());
             payroll.setDepartment(savedUser.getDepartment());
             payroll.setSalary(0.0);
             payrollRepository.save(payroll);
 
+            // Create Performance entry
             EmployeePerformance performance = new EmployeePerformance();
             performance.setFullName(savedUser.getFullname());
             performance.setDepartment(savedUser.getDepartment());
@@ -60,12 +65,14 @@ public class UserController {
 
             return ResponseEntity.status(HttpStatus.CREATED)
                     .body("User created with payroll and performance initialized!");
+
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Error during signup: " + e.getMessage());
         }
     }
+
 
     // --- Forget Password ---
     @PostMapping("/forgetpassword")

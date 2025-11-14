@@ -10,7 +10,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/performance")
-@CrossOrigin(origins = "http://localhost:5173")  // adjust if needed
+@CrossOrigin(origins = "*")  // adjust if needed
 public class EmployeePerformanceController {
 
     private final EmployeePerformanceRepository repository;

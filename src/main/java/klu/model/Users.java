@@ -26,9 +26,12 @@ public class Users {
 
     @Lob
     @Column(name = "photo", columnDefinition = "LONGTEXT")
-    private String photo; // ✅ base64 encoded photo
+    private String photo; // Base64 photo
 
-    // Getters & setters
+    @Version
+    private Long version; // FIX ➝ Added for optimistic locking protection
+
+    // Getters and Setters
     public Long getEmpid() { return empid; }
     public void setEmpid(Long empid) { this.empid = empid; }
 
@@ -52,4 +55,7 @@ public class Users {
 
     public String getPhoto() { return photo; }
     public void setPhoto(String photo) { this.photo = photo; }
+
+    public Long getVersion() { return version; }
+    public void setVersion(Long version) { this.version = version; }
 }
